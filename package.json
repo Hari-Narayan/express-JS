@@ -1,5 +1,5 @@
 {
-  "name": "express-api-creator",
+  "name": "express-js",
   "version": "0.1.0",
   "description": "Scaffold an Express.js boilerplate project. You can generate express.js boilerplate code with a single command.",
   "main": "server.js",
