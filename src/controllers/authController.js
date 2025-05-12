@@ -6,7 +6,6 @@ import mailer from "../helpers/mailerHelper.js";
 import { USER_NOT_FOUND } from "../lang/en/user.js";
 import ResetPassword from "../models/resetPassword.js";
 import ResponseHelper from "../helpers/responseHelper.js";
-import { SOMETHING_WENT_WRONG } from "../lang/en/common.js";
 import CommonHelper, { generateToken } from "../helpers/commonHelper.js";
 import {
   LOGIN_SUCCESS,
@@ -61,10 +60,11 @@ export async function register(req, res) {
     let user = await User.findOne({ email: req.body.email });
 
     if (user)
-      return res.json({
-        status: 400,
-        msg: USER_ALREADY_EXIST,
+      return ResponseHelper.error({
+        res,
+        statusCode: 400,
         error: USER_ALREADY_EXIST,
+        message: USER_ALREADY_EXIST,
       });
 
     user = await new User(req.body).save();
@@ -78,12 +78,9 @@ export async function register(req, res) {
       message: LOGIN_SUCCESS,
     });
   } catch (error) {
-    console.error(error);
-
-    return res.json({
-      error: JSON.stringify(error),
-      status: 400,
-      msg: SOMETHING_WENT_WRONG,
+    return ResponseHelper.error({
+      res,
+      error,
     });
   }
 }
@@ -94,10 +91,11 @@ export async function forgotPassword(req, res) {
     const user = await User.findOne({ email });
 
     if (!user)
-      return res.json({
-        status: 404,
-        msg: USER_NOT_FOUND,
+      return ResponseHelper.error({
+        res,
+        statusCode: 404,
         error: USER_NOT_FOUND,
+        message: USER_NOT_FOUND,
       });
 
     await ResetPassword.findOneAndDelete({ email });
@@ -117,16 +115,14 @@ export async function forgotPassword(req, res) {
       )}" target="_blank">Click here to reset password</a>`,
     });
 
-    return res.json({
+    return ResponseHelper.success({
+      res,
       data: resetUser,
-      msg: RESET_LINK_SENT_SUCCESS,
+      message: RESET_LINK_SENT_SUCCESS,
     });
   } catch (error) {
-    console.error(error);
-
-    return res.json({
-      msg: SOMETHING_WENT_WRONG,
-      status: 400,
+    return ResponseHelper.error({
+      res,
       error,
     });
   }
@@ -140,17 +136,17 @@ export async function resetPassword(req, res) {
     const now = new Date().getTime();
 
     if (now > expiredAt)
-      return res.json({
-        status: 400,
-        msg: RESET_LINK_EXPIRED,
+      return ResponseHelper.error({
+        statusCode: 400,
         error: RESET_LINK_EXPIRED,
+        message: RESET_LINK_EXPIRED,
       });
 
     if (newPassword !== confirmPassword)
-      return res.json({
-        status: 400,
-        msg: "Password & Confirm password does not match!",
-        // error: RESET_LINK_EXPIRED,
+      return ResponseHelper.error({
+        statusCode: 400,
+        error: "Password & Confirm password does not match!",
+        message: "Password & Confirm password does not match!",
       });
 
     await User.findOneAndUpdate(
@@ -161,14 +157,12 @@ export async function resetPassword(req, res) {
 
     await deleteOne({ token });
 
-    return res.json({
-      // data:"Y",
-      msg: PASSWORD_CHANGED_SUCCESS,
+    return ResponseHelper.success({
+      message: PASSWORD_CHANGED_SUCCESS,
     });
   } catch (error) {
-    return res.json({
-      msg: SOMETHING_WENT_WRONG,
-      status: 400,
+    return ResponseHelper.error({
+      res,
       error,
     });
   }

@@ -1,26 +1,24 @@
 import { compare } from "bcryptjs";
 
 import User from "../models/user.js";
-import { SOMETHING_WENT_WRONG } from "../lang/en/common.js";
+import ResponseHelper from "../helpers/responseHelper.js";
 import { USER_FOUND, USER_NOT_FOUND } from "../lang/en/user.js";
 import {
   INCORRECT_PASSWORD,
   PASSWORD_CHANGED_SUCCESS,
 } from "../lang/en/auth.js";
 
-export async function myProfile(req, res, next) {
+export async function myProfile(req, res) {
   try {
-    return res.success({
+    return ResponseHelper.success({
       data: req.user,
-      msg: USER_FOUND,
+      message: USER_FOUND,
     });
   } catch (error) {
-    next(error);
-    // return res.json({
-    //   error,
-    //   status: 500,
-    //   msg: SOMETHING_WENT_WRONG,
-    // });
+    return ResponseHelper.error({
+      res,
+      error,
+    });
   }
 }
 
@@ -30,20 +28,21 @@ export async function changePassword(req, res) {
     const user = await User.findOne({ email });
 
     if (!user) {
-      return res.json({
-        status: 404,
-        msg: USER_NOT_FOUND,
+      return ResponseHelper.error({
+        res,
+        statusCode: 404,
         error: USER_NOT_FOUND,
+        message: USER_NOT_FOUND,
       });
     }
 
     const isPassMatched = compare(password, user.password);
 
     if (!isPassMatched) {
-      return res.json({
-        status: 400,
-        msg: INCORRECT_PASSWORD,
+      return ResponseHelper.error({
+        statusCode: 400,
         error: INCORRECT_PASSWORD,
+        message: INCORRECT_PASSWORD,
       });
     }
 
@@ -53,13 +52,12 @@ export async function changePassword(req, res) {
       { new: true }
     );
 
-    return res.json({
+    return ResponseHelper.success({
       msg: PASSWORD_CHANGED_SUCCESS,
     });
   } catch (error) {
-    return res.json({
-      msg: SOMETHING_WENT_WRONG,
-      status: 400,
+    return ResponseHelper.error({
+      res,
       error,
     });
   }

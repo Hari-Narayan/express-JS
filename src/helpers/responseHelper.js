@@ -17,7 +17,12 @@ class ResponseHelper {
     });
   };
 
-  static success = ({ res, data, statusCode = 200, message = "Success" }) => {
+  static success = ({
+    res,
+    data = {},
+    statusCode = 200,
+    message = "Success",
+  }) => {
     return res.status(statusCode).json({
       data,
       message,
