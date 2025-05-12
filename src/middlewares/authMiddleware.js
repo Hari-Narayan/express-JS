@@ -2,25 +2,26 @@ import jwt from "jsonwebtoken";
 
 import User from "../models/user.js";
 import configs from "../config/index.js";
+import { UNAUTHORIZED } from "../lang/en/auth.js";
+import ResponseHelper from "../helpers/responseHelper.js";
 
 const auth = async (req, res, next) => {
   let token = req.headers.authorization || "";
   token = token ? token.replace("Bearer ", "") : "";
 
   try {
-    const data = jwt.verify(token, configs.jwtSecret);
-    const user = await User.findOne({ email: data.email });
+    const { email = "" } = jwt.verify(token, configs.jwtSecret);
+    const user = await User.findOne({ email });
     req.user = user;
 
     return next();
   } catch (error) {
-    response = {
-      data: null,
-      status: 401,
-      success: false,
-      message: "You are unauthorized!",
-    };
-    return res.status(401).json(response);
+    return ResponseHelper.error({
+      res,
+      error,
+      statusCode: 401,
+      message: UNAUTHORIZED,
+    });
   }
 };
 
