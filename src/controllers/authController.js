@@ -1,13 +1,13 @@
-import jwt from "jsonwebtoken";
 import { compareSync } from "bcryptjs";
 
 import User from "../models/user.js";
+import configs from "../config/index.js";
 import mailer from "../helpers/mailerHelper.js";
 import { USER_NOT_FOUND } from "../lang/en/user.js";
-import CommonHelper from "../helpers/commonHelper.js";
 import ResetPassword from "../models/resetPassword.js";
 import ResponseHelper from "../helpers/responseHelper.js";
 import { SOMETHING_WENT_WRONG } from "../lang/en/common.js";
+import CommonHelper, { generateToken } from "../helpers/commonHelper.js";
 import {
   LOGIN_SUCCESS,
   INCORRECT_PASSWORD,
@@ -17,7 +17,7 @@ import {
   PASSWORD_CHANGED_SUCCESS,
 } from "../lang/en/auth.js";
 
-export async function login(req, res, next) {
+export async function login(req, res) {
   try {
     const { email, password } = req.body;
     let user = await User.findOne({ email });
@@ -40,11 +40,7 @@ export async function login(req, res, next) {
         message: INCORRECT_PASSWORD,
       });
 
-    const token = jwt.sign({ email }, process.env.JWT_SECRET, {
-      expiresIn: "24h",
-    });
-
-    user.token = token;
+    user.token = generateToken(user.email);
 
     return ResponseHelper.success({
       res,
@@ -73,11 +69,7 @@ export async function register(req, res) {
 
     user = await new User(req.body).save();
 
-    const token = jwt.sign({ email: user.email }, process.env.JWT_SECRET, {
-      expiresIn: "24h",
-    });
-
-    user.token = token;
+    user.token = generateToken(user.email);
 
     return ResponseHelper.success({
       res,
@@ -119,7 +111,7 @@ export async function forgotPassword(req, res) {
     await mailer({
       to: email,
       subject: "Reset Password",
-      html: `<a href="${process.env.RESET_URL.replace(
+      html: `<a href="${configs.resetLink.replace(
         "token",
         resetUser.token
       )}" target="_blank">Click here to reset password</a>`,

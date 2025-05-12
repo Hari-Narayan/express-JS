@@ -1,18 +1,11 @@
 import fs from "fs";
-import { configDotenv } from "dotenv";
-import { expand } from "dotenv-expand";
 import express, { json } from "express";
 import { color } from "console-log-colors";
 
-expand(configDotenv());
-
+import configs from "./src/config/index.js";
 import rootRouter from "./src/routes/index.js";
 import CommonHelper from "./src/helpers/commonHelper.js";
 import mongooseConnect from "./src/config/mongooseConnect.js";
-
-const port = process.env.PORT || 3000;
-const baseUrl = process.env.BASE_URL || "";
-const urlPrefix = process.env.URL_PREFIX || "/api";
 
 const startServer = async () => {
   const app = express();
@@ -29,21 +22,17 @@ const startServer = async () => {
       res.send(`Welcome to the ${packageJson.name} API!`);
     });
 
-    app.use(urlPrefix, rootRouter);
+    app.use(configs.urlPrefix, rootRouter);
 
-    app.listen(port, () => {
-      console.info(`\nServer running on ${color.blue(`${baseUrl}/`)}`);
-      console.info(
-        `API Base URL ${color.blue(
-          `${process.env.API_BASE_URL || `${baseUrl}${urlPrefix}`}/`
-        )}`
-      );
+    app.listen(configs.port, () => {
+      console.info(`\nServer running on ${color.blue(`${configs.baseUrl}/`)}`);
+      console.info(`API Base URL ${color.blue(configs.apiBaseUrl)}`);
 
       if (expressVersion.includes("4")) {
         // Generate JSON from rootRouter.stack
         const result = CommonHelper.serializeRouterStack(
           rootRouter.stack,
-          `${baseUrl}${urlPrefix}`
+          configs.apiBaseUrl
         );
 
         console.table(CommonHelper.extractRoutes(result.layers));

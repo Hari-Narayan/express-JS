@@ -1,13 +1,14 @@
 import jwt from "jsonwebtoken";
 
 import User from "../models/user.js";
+import configs from "../config/index.js";
 
 const auth = async (req, res, next) => {
   let token = req.headers.authorization || "";
   token = token ? token.replace("Bearer ", "") : "";
 
   try {
-    const data = jwt.verify(token, process.env.JWT_SECRET);
+    const data = jwt.verify(token, configs.jwtSecret);
     const user = await User.findOne({ email: data.email });
     req.user = user;
 

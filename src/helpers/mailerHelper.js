@@ -1,12 +1,14 @@
 import { createTransport } from "nodemailer";
 
+import configs from "../config/index.js";
+
 const transporter = createTransport({
-  host: process.env.MAIL_HOST,
-  port: process.env.MAIL_PORT,
+  host: configs.mailHost,
+  port: configs.mailPort,
   secure: false, // true for port 465, false for other ports
   auth: {
-    user: process.env.MAIL_USER, // generated ethereal user
-    pass: process.env.MAIL_PASSWORD, // generated ethereal password
+    user: configs.mailUser, // generated ethereal user
+    pass: configs.mailPassword, // generated ethereal password
   },
 });
 
@@ -15,7 +17,7 @@ async function mailer({ to, subject = "", text = "", html = "" }) {
   let mailOptions = {
     to: to,
     subject,
-    from: process.env.MAIL_SENDER, // sender address
+    from: configs.MAIL_SENDER, // sender address
   };
 
   if (html) mailOptions.html = html;

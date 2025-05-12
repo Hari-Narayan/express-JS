@@ -1,3 +1,4 @@
+import configs from "../config/index.js";
 import { SOMETHING_WENT_WRONG } from "../lang/en/common.js";
 
 class ResponseHelper {
@@ -7,7 +8,7 @@ class ResponseHelper {
     statusCode = 500,
     message = SOMETHING_WENT_WRONG,
   }) => {
-    const environment = process.env.NODE_ENV || "development";
+    const environment = configs.environment;
 
     return res.status(statusCode).json({
       success: false,
