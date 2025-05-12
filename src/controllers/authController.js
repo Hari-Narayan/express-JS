@@ -9,6 +9,7 @@ import ResponseHelper from "../helpers/responseHelper.js";
 import CommonHelper, { generateToken } from "../helpers/commonHelper.js";
 import {
   LOGIN_SUCCESS,
+  PASSWORD_MISMATCH,
   INCORRECT_PASSWORD,
   USER_ALREADY_EXIST,
   RESET_LINK_EXPIRED,
@@ -145,8 +146,8 @@ export async function resetPassword(req, res) {
     if (newPassword !== confirmPassword)
       return ResponseHelper.error({
         statusCode: 400,
-        error: "Password & Confirm password does not match!",
-        message: "Password & Confirm password does not match!",
+        error: PASSWORD_MISMATCH,
+        message: PASSWORD_MISMATCH,
       });
 
     await User.findOneAndUpdate(
