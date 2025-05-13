@@ -30,7 +30,7 @@ const auth = async (req, res, next) => {
     return ResponseHelper.error({
       res,
       error,
-      statusCode: 401,
+      code: 401,
       message: UNAUTHORIZED,
     });
   }

@@ -5,7 +5,6 @@ import { setJson, encryptPassword } from "../helpers/modelHelper.js";
 const schema = new mongoose.Schema(
   {
     fullName: { type: String, required: true, trim: true },
-    status: { type: Boolean, required: true, default: true },
     email: { type: String, required: true, trim: true, unique: true },
     password: {
       type: String,

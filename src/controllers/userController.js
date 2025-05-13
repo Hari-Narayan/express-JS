@@ -34,7 +34,7 @@ export async function updatePassword(req, res) {
     if (!user) {
       return ResponseHelper.error({
         res,
-        statusCode: 404,
+        code: 404,
         error: USER_NOT_FOUND,
         message: USER_NOT_FOUND,
       });
@@ -45,7 +45,7 @@ export async function updatePassword(req, res) {
     if (!isPassMatched) {
       return ResponseHelper.error({
         res,
-        statusCode: 400,
+        code: 400,
         error: INCORRECT_PASSWORD,
         message: INCORRECT_PASSWORD,
       });

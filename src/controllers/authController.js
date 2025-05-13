@@ -25,7 +25,7 @@ export async function login(req, res) {
     if (!user)
       return ResponseHelper.error({
         res,
-        statusCode: 404,
+        code: 404,
         error: USER_NOT_FOUND,
         message: USER_NOT_FOUND,
       });
@@ -35,7 +35,7 @@ export async function login(req, res) {
     if (!isPassMatched)
       return ResponseHelper.error({
         res,
-        statusCode: 400,
+        code: 400,
         error: INCORRECT_PASSWORD,
         message: INCORRECT_PASSWORD,
       });
@@ -45,7 +45,7 @@ export async function login(req, res) {
     return ResponseHelper.success({
       res,
       data: user,
-      statusCode: 200,
+      code: 200,
       msg: LOGIN_SUCCESS,
     });
   } catch (error) {
@@ -63,7 +63,7 @@ export async function register(req, res) {
     if (user)
       return ResponseHelper.error({
         res,
-        statusCode: 400,
+        code: 400,
         error: USER_ALREADY_EXIST,
         message: USER_ALREADY_EXIST,
       });
@@ -75,7 +75,7 @@ export async function register(req, res) {
     return ResponseHelper.success({
       res,
       data: user,
-      statusCode: 201,
+      code: 201,
       message: LOGIN_SUCCESS,
     });
   } catch (error) {
@@ -94,7 +94,7 @@ export async function forgotPassword(req, res) {
     if (!user)
       return ResponseHelper.error({
         res,
-        statusCode: 404,
+        code: 404,
         error: USER_NOT_FOUND,
         message: USER_NOT_FOUND,
       });
@@ -136,7 +136,7 @@ export async function resetPassword(req, res) {
     if (!resetPassword)
       return ResponseHelper.error({
         res,
-        statusCode: 404,
+        code: 404,
         error: TOKEN_NOT_FOUND,
         message: TOKEN_NOT_FOUND,
       });
@@ -146,7 +146,7 @@ export async function resetPassword(req, res) {
 
     if (now > expiredAt)
       return ResponseHelper.error({
-        statusCode: 400,
+        code: 400,
         message: RESET_LINK_EXPIRED,
       });
 
