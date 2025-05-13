@@ -1,3 +1,4 @@
+export const TOKEN_NOT_FOUND = "Token not found!";
 export const UNAUTHORIZED = "You are unauthorized!";
 export const USER_ALREADY_EXIST = "User already exist";
 export const RESET_LINK_EXPIRED = "Reset link is expired!";

@@ -1,7 +1,9 @@
-import fs from "fs";
 import { resolve } from "path";
+import jwt from "jsonwebtoken";
 import { readFileSync } from "fs";
 import { color } from "console-log-colors";
+
+import configs from "../configs/index.js";
 
 export default class CommonHelper {
   /**
@@ -144,19 +146,19 @@ export default class CommonHelper {
 
     return routes;
   }
+
+  /**
+   * ### Generate JWT Token
+   * @param email - The email address to be encoded in the token.
+   * @description Generates a JWT token for the given email address.
+   * The token is signed using a secret key and has an expiration time of 24 hours.
+   * @returns - The generated JWT token.
+   */
+  static generateToken = (email) => {
+    const token = jwt.sign({ email }, configs.jwtSecret, {
+      expiresIn: "24h",
+    });
+
+    return token;
+  };
 }
-
-/**
- * ### Generate JWT Token
- * @param email - The email address to be encoded in the token.
- * @description Generates a JWT token for the given email address.
- * The token is signed using a secret key and has an expiration time of 24 hours.
- * @returns - The generated JWT token.
- */
-export const generateToken = (email) => {
-  const token = jwt.sign({ email }, config.jwtSecret, {
-    expiresIn: "24h",
-  });
-
-  return token;
-};

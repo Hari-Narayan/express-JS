@@ -2,9 +2,14 @@ import { Router } from "express";
 
 const userRouter = Router();
 
-import { myProfile, changePassword } from "../controllers/userController.js";
+import {
+  list,
+  myProfile,
+  updatePassword,
+} from "../controllers/userController.js";
 
+userRouter.get("/list", list);
 userRouter.post("/my-profile", myProfile);
-userRouter.post("/change-password", changePassword);
+userRouter.post("/update-password", updatePassword);
 
 export default userRouter;

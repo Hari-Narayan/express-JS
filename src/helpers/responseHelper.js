@@ -1,4 +1,4 @@
-import configs from "../config/index.js";
+import configs from "../configs/index.js";
 import { SOMETHING_WENT_WRONG } from "../lang/en/common.js";
 
 class ResponseHelper {

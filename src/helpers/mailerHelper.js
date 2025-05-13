@@ -1,6 +1,6 @@
 import { createTransport } from "nodemailer";
 
-import configs from "../config/index.js";
+import configs from "../configs/index.js";
 
 const transporter = createTransport({
   host: configs.mailHost,

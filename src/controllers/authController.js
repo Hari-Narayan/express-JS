@@ -1,15 +1,15 @@
 import { compareSync } from "bcryptjs";
 
 import User from "../models/user.js";
-import configs from "../config/index.js";
+import configs from "../configs/index.js";
 import mailer from "../helpers/mailerHelper.js";
 import { USER_NOT_FOUND } from "../lang/en/user.js";
+import CommonHelper from "../helpers/commonHelper.js";
 import ResetPassword from "../models/resetPassword.js";
 import ResponseHelper from "../helpers/responseHelper.js";
-import CommonHelper, { generateToken } from "../helpers/commonHelper.js";
 import {
   LOGIN_SUCCESS,
-  PASSWORD_MISMATCH,
+  TOKEN_NOT_FOUND,
   INCORRECT_PASSWORD,
   USER_ALREADY_EXIST,
   RESET_LINK_EXPIRED,
@@ -40,7 +40,7 @@ export async function login(req, res) {
         message: INCORRECT_PASSWORD,
       });
 
-    user.token = generateToken(user.email);
+    user.token = CommonHelper.generateToken(user.email);
 
     return ResponseHelper.success({
       res,
@@ -70,7 +70,7 @@ export async function register(req, res) {
 
     user = await new User(req.body).save();
 
-    user.token = generateToken(user.email);
+    user.token = CommonHelper.generateToken(user.email);
 
     return ResponseHelper.success({
       res,
@@ -118,7 +118,6 @@ export async function forgotPassword(req, res) {
 
     return ResponseHelper.success({
       res,
-      data: resetUser,
       message: RESET_LINK_SENT_SUCCESS,
     });
   } catch (error) {
@@ -131,34 +130,36 @@ export async function forgotPassword(req, res) {
 
 export async function resetPassword(req, res) {
   try {
-    const { token, newPassword, confirmPassword } = req.body;
+    const { token, password } = req.body;
     const resetPassword = await ResetPassword.findOne({ token });
+
+    if (!resetPassword)
+      return ResponseHelper.error({
+        res,
+        statusCode: 404,
+        error: TOKEN_NOT_FOUND,
+        message: TOKEN_NOT_FOUND,
+      });
+
     const { email, expiredAt } = resetPassword;
     const now = new Date().getTime();
 
     if (now > expiredAt)
       return ResponseHelper.error({
         statusCode: 400,
-        error: RESET_LINK_EXPIRED,
         message: RESET_LINK_EXPIRED,
-      });
-
-    if (newPassword !== confirmPassword)
-      return ResponseHelper.error({
-        statusCode: 400,
-        error: PASSWORD_MISMATCH,
-        message: PASSWORD_MISMATCH,
       });
 
     await User.findOneAndUpdate(
       { email },
-      { $set: { password: newPassword } },
+      { $set: { password } },
       { new: true }
     );
 
-    await deleteOne({ token });
+    await ResetPassword.deleteOne({ token });
 
     return ResponseHelper.success({
+      res,
       message: PASSWORD_CHANGED_SUCCESS,
     });
   } catch (error) {

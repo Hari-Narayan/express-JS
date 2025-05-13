@@ -2,10 +2,10 @@ import fs from "fs";
 import express, { json } from "express";
 import { color } from "console-log-colors";
 
-import configs from "./src/config/index.js";
+import configs from "./src/configs/index.js";
 import rootRouter from "./src/routes/index.js";
 import CommonHelper from "./src/helpers/commonHelper.js";
-import mongooseConnect from "./src/config/mongooseConnect.js";
+import mongooseConnect from "./src/configs/mongooseConnect.js";
 
 const startServer = async () => {
   const app = express();
