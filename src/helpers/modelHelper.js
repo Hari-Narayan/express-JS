@@ -1,14 +1,16 @@
 import moment from "moment";
 import { genSaltSync, hashSync } from "bcryptjs";
 
+import configs from "../configs/index.js";
+
 export const setJson = {
   getters: true,
-  transform: (doc, res) => {
-    delete res._id;
-    delete res.password;
+  transform: (doc, ret) => {
+    delete ret._id;
+    delete ret.password;
 
-    res.createdAt = moment(res.createdAt).format("YYYY-MM-DD HH:mm:ss");
-    res.updatedAt = moment(res.updatedAt).format("YYYY-MM-DD HH:mm:ss");
+    ret.createdAt = moment(ret.createdAt).format(configs.dateFormat);
+    ret.updatedAt = moment(ret.updatedAt).format(configs.dateFormat);
   },
 };
 
