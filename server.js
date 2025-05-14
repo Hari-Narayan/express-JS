@@ -12,7 +12,6 @@ const startServer = async () => {
   app.use(json());
 
   const packageJson = JSON.parse(fs.readFileSync("package.json"));
-  const expressVersion = packageJson.dependencies.express.toString();
 
   try {
     // Wait for MongoDB connection
@@ -28,23 +27,7 @@ const startServer = async () => {
       console.info(`\nServer running on ${color.blue(`${configs.baseUrl}/`)}`);
       console.info(`API Base URL ${color.blue(configs.apiBaseUrl)}`);
 
-      if (expressVersion.includes("4")) {
-        // Generate JSON from rootRouter.stack
-        const result = CommonHelper.serializeRouterStack(
-          rootRouter.stack,
-          configs.apiBaseUrl
-        );
-
-        console.table(CommonHelper.extractRoutes(result.layers));
-      } else {
-        console.info(
-          `${color.red(
-            `You are using Express version ${expressVersion}. So, serializeRouterStack and extractRoutePaths will not support.`
-          )}\n${color.white(
-            `NOTE: Please use Express version 4.x.x for this feature.`
-          )}`
-        );
-      }
+      CommonHelper.displayRoutes(packageJson, rootRouter);
     });
   } catch (err) {
     console.error("Failed to start server:", err);
