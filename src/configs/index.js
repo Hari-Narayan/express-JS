@@ -17,6 +17,7 @@ const configs = {
   mailPassword: process.env.MAIL_PASSWORD || "",
   jwtSecret: process.env.JWT_SECRET || "jwt_secret",
   environment: process.env.NODE_ENV || "development",
+  uploadPath: process.env.UPLOAD_PATH || "/public/uploads/",
 };
 
 export default configs;

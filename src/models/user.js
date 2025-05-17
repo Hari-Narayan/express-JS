@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-import { setJson, encryptPassword } from "../helpers/modelHelper.js";
+import { setJson, encryptPassword, createFileURL } from "../helpers/Model.js";
 
 const schema = new mongoose.Schema(
   {
@@ -10,6 +10,11 @@ const schema = new mongoose.Schema(
       type: String,
       required: false,
       set: encryptPassword,
+    },
+    profileImage: {
+      type: String,
+      required: false,
+      get: (value) => createFileURL(value, "users"),
     },
   },
   {

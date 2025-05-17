@@ -20,3 +20,7 @@ export function encryptPassword(password) {
 
   return hash;
 }
+
+export const createFileURL = (image, folder) => {
+  return image ? `${configs.baseUrl}/${folder}/${image}` : "";
+};

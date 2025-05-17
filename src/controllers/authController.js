@@ -2,19 +2,19 @@ import { compareSync } from "bcryptjs";
 
 import User from "../models/user.js";
 import configs from "../configs/index.js";
-import mailer from "../helpers/mailerHelper.js";
+import MailHelper from "../helpers/Mail.js";
+import CommonHelper from "../helpers/Common.js";
 import { USER_NOT_FOUND } from "../lang/en/user.js";
-import CommonHelper from "../helpers/commonHelper.js";
+import ResponseHelper from "../helpers/Response.js";
 import ResetPassword from "../models/resetPassword.js";
-import ResponseHelper from "../helpers/responseHelper.js";
 import {
   LOGIN_SUCCESS,
   TOKEN_NOT_FOUND,
+  RESET_LINK_SENT,
+  PASSWORD_CHANGED,
   INCORRECT_PASSWORD,
   USER_ALREADY_EXIST,
   RESET_LINK_EXPIRED,
-  RESET_LINK_SENT_SUCCESS,
-  PASSWORD_CHANGED_SUCCESS,
 } from "../lang/en/auth.js";
 
 export async function login(req, res) {
@@ -26,7 +26,6 @@ export async function login(req, res) {
       return ResponseHelper.error({
         res,
         code: 404,
-        error: USER_NOT_FOUND,
         message: USER_NOT_FOUND,
       });
 
@@ -36,7 +35,6 @@ export async function login(req, res) {
       return ResponseHelper.error({
         res,
         code: 400,
-        error: INCORRECT_PASSWORD,
         message: INCORRECT_PASSWORD,
       });
 
@@ -49,10 +47,7 @@ export async function login(req, res) {
       msg: LOGIN_SUCCESS,
     });
   } catch (error) {
-    return ResponseHelper.error({
-      res,
-      error,
-    });
+    return ResponseHelper.error({ res, error });
   }
 }
 
@@ -64,7 +59,6 @@ export async function register(req, res) {
       return ResponseHelper.error({
         res,
         code: 400,
-        error: USER_ALREADY_EXIST,
         message: USER_ALREADY_EXIST,
       });
 
@@ -74,15 +68,12 @@ export async function register(req, res) {
 
     return ResponseHelper.success({
       res,
-      data: user,
       code: 201,
+      data: user,
       message: LOGIN_SUCCESS,
     });
   } catch (error) {
-    return ResponseHelper.error({
-      res,
-      error,
-    });
+    return ResponseHelper.error({ res, error });
   }
 }
 
@@ -95,7 +86,6 @@ export async function forgotPassword(req, res) {
       return ResponseHelper.error({
         res,
         code: 404,
-        error: USER_NOT_FOUND,
         message: USER_NOT_FOUND,
       });
 
@@ -107,7 +97,7 @@ export async function forgotPassword(req, res) {
       expiredAt: new Date().getTime() + 1000 * 60 * 60,
     }).save();
 
-    await mailer({
+    await MailHelper.send({
       to: email,
       subject: "Reset Password",
       html: `<a href="${configs.resetLink.replace(
@@ -118,13 +108,10 @@ export async function forgotPassword(req, res) {
 
     return ResponseHelper.success({
       res,
-      message: RESET_LINK_SENT_SUCCESS,
+      message: RESET_LINK_SENT,
     });
   } catch (error) {
-    return ResponseHelper.error({
-      res,
-      error,
-    });
+    return ResponseHelper.error({ res, error });
   }
 }
 
@@ -137,7 +124,6 @@ export async function resetPassword(req, res) {
       return ResponseHelper.error({
         res,
         code: 404,
-        error: TOKEN_NOT_FOUND,
         message: TOKEN_NOT_FOUND,
       });
 
@@ -158,14 +144,8 @@ export async function resetPassword(req, res) {
 
     await ResetPassword.deleteOne({ token });
 
-    return ResponseHelper.success({
-      res,
-      message: PASSWORD_CHANGED_SUCCESS,
-    });
+    return ResponseHelper.success({ res, message: PASSWORD_CHANGED });
   } catch (error) {
-    return ResponseHelper.error({
-      res,
-      error,
-    });
+    return ResponseHelper.error({ res, error });
   }
 }

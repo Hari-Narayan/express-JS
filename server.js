@@ -1,15 +1,23 @@
 import fs from "fs";
-import express, { json } from "express";
+import cors from "cors";
+import { join } from "path";
+import express from "express";
 import { color } from "console-log-colors";
+import expressFileUpload from "express-fileupload";
 
 import configs from "./src/configs/index.js";
 import rootRouter from "./src/routes/index.js";
-import CommonHelper from "./src/helpers/commonHelper.js";
+import CommonHelper from "./src/helpers/Common.js";
 import mongooseConnect from "./src/configs/mongooseConnect.js";
 
 const startServer = async () => {
   const app = express();
-  app.use(json());
+
+  app.use(cors());
+  app.use(express.json());
+  app.use(express.urlencoded({ extended: true }));
+  app.use(expressFileUpload({ createParentPath: true }));
+  app.use(express.static(join(process.cwd(), configs.uploadPath)));
 
   const packageJson = JSON.parse(fs.readFileSync("package.json"));
 

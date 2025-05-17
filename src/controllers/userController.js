@@ -1,13 +1,10 @@
 import { compare } from "bcryptjs";
 
 import User from "../models/user.js";
-import ResponseHelper from "../helpers/responseHelper.js";
-import { SOMETHING_WENT_WRONG } from "../lang/en/common.js";
-import { USER_FOUND, USER_NOT_FOUND } from "../lang/en/user.js";
-import {
-  INCORRECT_PASSWORD,
-  PASSWORD_CHANGED_SUCCESS,
-} from "../lang/en/auth.js";
+import ResponseHelper from "../helpers/Response.js";
+import FileUploadHelper from "../helpers/FileUpload.js";
+import { PASSWORD_CHANGED, INCORRECT_PASSWORD } from "../lang/en/auth.js";
+import { IMAGE_UPLOADED, USER_FOUND, USER_NOT_FOUND } from "../lang/en/user.js";
 
 export async function myProfile(req, res) {
   try {
@@ -17,10 +14,7 @@ export async function myProfile(req, res) {
       message: USER_FOUND,
     });
   } catch (error) {
-    return ResponseHelper.error({
-      res,
-      error,
-    });
+    return ResponseHelper.error({ res, error });
   }
 }
 
@@ -34,7 +28,6 @@ export async function updatePassword(req, res) {
       return ResponseHelper.error({
         res,
         code: 400,
-        error: INCORRECT_PASSWORD,
         message: INCORRECT_PASSWORD,
       });
     }
@@ -46,14 +39,10 @@ export async function updatePassword(req, res) {
 
     return ResponseHelper.success({
       res,
-      message: PASSWORD_CHANGED_SUCCESS,
+      message: PASSWORD_CHANGED,
     });
   } catch (error) {
-    return ResponseHelper.error({
-      res,
-      error,
-      message: SOMETHING_WENT_WRONG,
-    });
+    return ResponseHelper.error({ res, error });
   }
 }
 
@@ -65,15 +54,33 @@ export const list = async (req, res) => {
       return ResponseHelper.error({
         res,
         code: 404,
-        error: USER_NOT_FOUND,
         message: USER_NOT_FOUND,
       });
     }
 
     return ResponseHelper.success({ res, data: users, message: USER_FOUND });
   } catch (error) {
-    console.error(error);
+    return ResponseHelper.error({ res, error });
+  }
+};
 
-    return ResponseHelper.error({ res, error, message: SOMETHING_WENT_WRONG });
+export const uploadImage = async (req, res) => {
+  try {
+    FileUploadHelper.singleFileUpload(req, "profileImage", "users");
+
+    const { profileImage } = req.body;
+    const { profileImage: oldProfileImage, _id } = req.user;
+
+    FileUploadHelper.removeSingleFile(oldProfileImage);
+
+    const user = await User.findByIdAndUpdate(
+      { _id },
+      { $set: { profileImage } },
+      { new: true }
+    );
+
+    return ResponseHelper.success({ res, data: user, message: IMAGE_UPLOADED });
+  } catch (error) {
+    return ResponseHelper.error({ res, error });
   }
 };

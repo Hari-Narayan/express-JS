@@ -1,6 +1,6 @@
 import { Schema, model } from "mongoose";
 
-import { setJson } from "../helpers/modelHelper.js";
+import { setJson } from "../helpers/Model.js";
 
 const schema = new Schema(
   {
